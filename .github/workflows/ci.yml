@@ -10,19 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Run cargo check
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
+      - name: Cargo check
+        run: cargo check
 
   test:
     name: Test Suite
@@ -47,11 +41,11 @@ jobs:
           - i686-unknown-linux-gnu
           - riscv64gc-unknown-linux-gnu
             #- sparc-unknown-linux-gnu
-            #- sparc64-unknown-linux-gnu
+          #- sparc64-unknown-linux-gnu
           - x86_64-unknown-linux-gnu
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
@@ -102,15 +96,15 @@ jobs:
             #- mips-unknown-linux-gnu
             #- mips64-unknown-linux-gnuabi64
             #- mipsel-unknown-linux-gnu
-            #- mips64el-unknown-linux-gnuabi64
+          #- mips64el-unknown-linux-gnuabi64
           - powerpc-unknown-linux-gnu
-            #- powerpc64-unknown-linux-gnu
+          #- powerpc64-unknown-linux-gnu
           - riscv64gc-unknown-linux-gnu
           - s390x-unknown-linux-gnu
           - x86_64-unknown-linux-gnu
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install nightly toolchain
         uses: actions-rs/toolchain@v1
@@ -139,7 +133,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
@@ -159,12 +153,12 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
-            toolchain: nightly
-            components: clippy
-            override: true
+          toolchain: nightly
+          components: clippy
+          override: true
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -178,7 +172,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: cargo login
         uses: actions-rs/cargo@v1
