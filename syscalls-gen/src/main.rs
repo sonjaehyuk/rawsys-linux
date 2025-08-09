@@ -5,6 +5,7 @@ use crate::tables::Source;
 use color_eyre::eyre::{eyre, Result, WrapErr};
 use futures::future::try_join_all;
 use lazy_static::lazy_static;
+use std::collections::HashSet;
 use std::future::Future;
 use std::path::Path;
 use std::pin::Pin;
@@ -16,8 +17,9 @@ mod tables;
 /// URL of the Linux repository to pull the syscall tables from.
 static LINUX_REPO: &str = "https://raw.githubusercontent.com/torvalds/linux";
 
-/// Linux version to pull the syscall tables from.
-static LINUX_VERSION: &str = "v6.10";
+/// Default Linux version to pull the syscall tables from.
+/// Multiple versions can be specified via CLI flags.
+static DEFAULT_LINUX_VERSION: &str = "v6.10";
 
 lazy_static! {
     /// List of syscall tables for each architecture.
@@ -149,8 +151,8 @@ impl<'a> ABI<'a> {
 }
 
 /// Fetches a file path from the repository.
-async fn fetch_path(path: &str) -> Result<String> {
-    let url = format!("{LINUX_REPO}/{LINUX_VERSION}/{path}");
+async fn fetch_path(path: &str, version: &str) -> Result<String> {
+    let url = format!("{LINUX_REPO}/{version}/{path}");
 
     println!("Fetching {url}");
     let contents = reqwest::get(&url)
@@ -163,23 +165,87 @@ async fn fetch_path(path: &str) -> Result<String> {
     Ok(contents)
 }
 
+fn parse_args() -> (Vec<String>, Option<HashSet<String>>) {
+    // Simple CLI parser to avoid extra dependencies.
+    // Supported flags:
+    //   --versions v6.8,v6.10   (comma-separated)
+    //   --version v6.10         (repeatable)
+    //   --archs x86_64,aarch64  (comma-separated)
+    //   --arch x86_64           (repeatable)
+    let mut versions: Vec<String> = Vec::new();
+    let mut archs: HashSet<String> = HashSet::new();
+
+    let mut args = std::env::args().skip(1);
+    while let Some(arg) = args.next() {
+        match arg.as_str() {
+            "--versions" => {
+                if let Some(v) = args.next() {
+                    for s in v.split(',') {
+                        let s = s.trim();
+                        if !s.is_empty() {
+                            versions.push(s.to_string());
+                        }
+                    }
+                }
+            }
+            "--version" => {
+                if let Some(v) = args.next() {
+                    versions.push(v);
+                }
+            }
+            "--archs" => {
+                if let Some(v) = args.next() {
+                    for s in v.split(',') {
+                        let s = s.trim();
+                        if !s.is_empty() {
+                            archs.insert(s.to_string());
+                        }
+                    }
+                }
+            }
+            "--arch" => {
+                if let Some(v) = args.next() {
+                    archs.insert(v);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    if versions.is_empty() {
+        versions.push(DEFAULT_LINUX_VERSION.to_string());
+    }
+
+    let archs = if archs.is_empty() { None } else { Some(archs) };
+    (versions, archs)
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     color_eyre::install()?;
 
     let base_dir = Path::new("..");
 
-    let mut futures: Vec<Pin<Box<dyn Future<Output = Result<()>>>>> =
-        Vec::new();
+    let (versions, arch_filter) = parse_args();
 
-    for source in SOURCES.iter() {
-        futures.push(Box::pin(source.generate(base_dir)));
+    for version in &versions {
+        let mut futures: Vec<Pin<Box<dyn Future<Output = Result<()>>>>> =
+            Vec::new();
+
+        for source in SOURCES.iter() {
+            if let Some(filter) = &arch_filter {
+                if !filter.contains(source.arch()) {
+                    continue;
+                }
+            }
+            futures.push(Box::pin(source.generate(base_dir, version)));
+        }
+
+        let errno = base_dir.join("src/errno/generated.rs");
+        futures.push(Box::pin(errors::generate_errno(errno, version.clone())));
+
+        try_join_all(futures).await?;
     }
-
-    let errno = base_dir.join("src/errno/generated.rs");
-    futures.push(Box::pin(errors::generate_errno(errno)));
-
-    try_join_all(futures).await?;
 
     Ok(())
 }

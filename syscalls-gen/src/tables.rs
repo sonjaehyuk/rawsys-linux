@@ -4,7 +4,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::borrow::Cow;
 use std::fmt;
-use std::fs::File;
+use std::fs::{create_dir_all, File};
 use std::io::Write;
 use std::path::Path;
 
@@ -45,8 +45,8 @@ impl TableEntry {
 }
 
 impl<'a> Table<'a> {
-    async fn fetch_table(&self) -> Result<Vec<TableEntry>> {
-        let contents = fetch_path(self.path).await?;
+    async fn fetch_table(&self, version: &str) -> Result<Vec<TableEntry>> {
+        let contents = fetch_path(self.path, version).await?;
 
         let mut table = Vec::new();
 
@@ -97,7 +97,7 @@ impl<'a> Table<'a> {
 }
 
 impl<'a> Header<'a> {
-    async fn fetch_table(&self) -> Result<Vec<TableEntry>> {
+    async fn fetch_table(&self, version: &str) -> Result<Vec<TableEntry>> {
         lazy_static! {
             // Pattern for matching the syscall definition.
             static ref RE_SYSCALLNR: Regex = Regex::new(r"^#define\s+__NR(?:3264)?_([a-z0-9_]+)\s+(\d+)").unwrap();
@@ -108,7 +108,7 @@ impl<'a> Header<'a> {
         let mut arch_specific_syscall: Option<u32> = None;
 
         for header in self.headers {
-            let contents = fetch_path(header).await?;
+            let contents = fetch_path(header, version).await?;
 
             for line in contents.lines() {
                 let line = line.trim();
@@ -180,31 +180,47 @@ impl<'a> Source<'a> {
         }
     }
 
-    async fn fetch_table(&self) -> Result<Vec<TableEntry>> {
+    async fn fetch_table(&self, version: &str) -> Result<Vec<TableEntry>> {
         match self {
-            Self::Table(table) => table.fetch_table().await,
-            Self::Header(header) => header.fetch_table().await,
+            Self::Table(table) => table.fetch_table(version).await,
+            Self::Header(header) => header.fetch_table(version).await,
         }
     }
 
-    /// Generates the source file.
-    pub(crate) async fn generate(&self, dir: &Path) -> Result<()> {
+    fn version_to_module(version: &str) -> String {
+        let v = version.strip_prefix('v').unwrap_or(version);
+        format!("v{}", v.replace('.', "_"))
+    }
+
+    /// Generates the source file for a specific arch and kernel version.
+    pub(crate) async fn generate(&self, dir: &Path, version: &str) -> Result<()> {
         let arch = self.arch();
         let table = self
-            .fetch_table()
+            .fetch_table(version)
             .await
             .wrap_err_with(|| eyre!("Failed fetching table for {arch}"))?;
 
-        // Generate `src/arch/{arch}.rs`
-        let path = dir.join(format!("src/arch/{arch}.rs"));
+        // Generate `src/arch/{arch}/vX_Y.rs`
+        let module = Self::version_to_module(version);
+        let arch_dir = dir.join(format!("src/arch/{arch}"));
+        create_dir_all(&arch_dir).wrap_err_with(|| {
+            eyre!("Failed to create directory {}", arch_dir.display())
+        })?;
+        let path = arch_dir.join(format!("{module}.rs"));
 
         let mut file = File::create(&path).wrap_err_with(|| {
             eyre!("Failed to create file {}", path.display())
         })?;
-        writeln!(file, "//! Syscalls for the `{arch}` architecture.\n")?;
+        writeln!(
+            file,
+            "//! Syscalls for the `{arch}` architecture (Linux {version}).\n"
+        )?;
         write!(file, "{}", SyscallFile(&table))?;
 
-        println!("Generated syscalls for {arch} at {}", path.display());
+        println!(
+            "Generated syscalls for {arch} {version} at {}",
+            path.display()
+        );
         Ok(())
     }
 }
