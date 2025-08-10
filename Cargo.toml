@@ -14,7 +14,7 @@ homepage = "https://github.com/sonjaehyuk/rawsys-linux"
 # documentation = "https://docs.rs/syscalls"
 
 [features]
-default = ["std", "serde"]
+default = ["std", "serde", "kernel_6_12"]
 
 # Enables all extra features.
 full = ["std", "serde", "all"]
@@ -51,7 +51,15 @@ serde = ["dep:serde", "serde_repr"]
 # automatically by `build.rs` if the target supports thumb-mode.
 thumb-mode = []
 
-# TODO: 커널 버전 선택할 수 있게.
+# Kernel version selection (pick exactly one).
+# By default, we target Linux 6.12 across all ISAs.
+kernel_5_4 = []
+kernel_5_10 = []
+kernel_5_15 = []
+kernel_6_1 = []
+kernel_6_6 = []
+kernel_6_10 = []
+kernel_6_12 = []
 
 [dependencies]
 serde = { version = "1.0", default-features = false, features = ["derive"], optional = true }
