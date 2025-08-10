@@ -22,19 +22,25 @@ const fn words<T>(bits: usize) -> usize {
 
 /// A set of syscalls.
 ///
-/// This provides constant-time lookup of syscalls within a bitset.
+/// Backed by a compact bitset, this provides constant-time membership checks
+/// and set algebra (union, intersection, difference) with predictable cost.
+/// The bit layout matches the `Sysno` table so that conversions are trivial.
+///
+/// Complexity
+/// - `contains`/`insert`/`remove`: O(1)
+/// - `count`/`is_empty`: O(n_words)
 ///
 /// # Examples
 ///
 /// ```
-/// # use syscalls::{Sysno, SysnoSet};
+/// # use rawsys_linux::{Sysno, SysnoSet};
 /// let syscalls = SysnoSet::new(&[Sysno::read, Sysno::write, Sysno::openat, Sysno::close]);
 /// assert!(syscalls.contains(Sysno::read));
 /// assert!(syscalls.contains(Sysno::close));
 /// ```
 /// Most operations can be done at compile-time as well.
 /// ```
-/// # use syscalls::{Sysno, SysnoSet};
+/// # use rawsys_linux::{Sysno, SysnoSet};
 /// const SYSCALLS: SysnoSet =
 ///     SysnoSet::new(&[Sysno::read, Sysno::write, Sysno::close])
 ///         .union(&SysnoSet::new(&[Sysno::openat]));
@@ -54,7 +60,7 @@ impl Default for SysnoSet {
 
 impl SysnoSet {
     /// The set of all valid syscalls.
-    const ALL: &'static Self = &Self::new(Sysno::ALL);
+    pub(crate) const ALL: &'static Self = &Self::new(Sysno::ALL);
 
     const WORD_WIDTH: usize = usize::BITS as usize;
 
@@ -91,10 +97,12 @@ impl SysnoSet {
     }
 
     /// Creates a set containing all valid syscalls.
+    ///
+    /// Note: This returns a by-value copy of the bitset. Prefer borrowing
+    /// `SysnoSet::ALL` directly when you only need membership checks to avoid
+    /// copying the entire array.
     pub const fn all() -> Self {
-        Self {
-            data: Self::ALL.data,
-        }
+        Self { data: Self::ALL.data }
     }
 
     /// Returns true if the set contains the given syscall.
@@ -207,7 +215,7 @@ impl SysnoSet {
     }
 
     /// Returns an iterator that iterates over the syscalls contained in the set.
-    pub fn iter(&self) -> SysnoSetIter {
+    pub fn iter(&self) -> SysnoSetIter<'_> {
         SysnoSetIter::new(self.data.iter())
     }
 }
@@ -347,8 +355,18 @@ impl Iterator for SysnoSetIter<'_> {
             let offset = Sysno::first().id() as u32;
             let sysno = index as u32 * usize::BITS + bit + offset;
 
-            // TODO: Use an unchecked conversion to speed this up.
-            return Some(Sysno::from(sysno));
+            // SAFETY: `index` is the position of a non-zero word from the
+            // bitset that represents this SysnoSet, and `bit` is the position
+            // of a set bit within that word. SysnoSet only ever sets bits for
+            // valid syscalls (constructed from `Sysno` values and closed under
+            // set ops), so the computed `sysno` always corresponds to a valid
+            // `Sysno` discriminant. The enum is `#[repr(i32)]`, so transmuting
+            // the integer value is sound.
+            #[cfg(debug_assertions)]
+            debug_assert!(Sysno::new(sysno as usize).is_some());
+
+            let s = unsafe { core::mem::transmute::<i32, Sysno>(sysno as i32) };
+            return Some(s);
         }
 
         None

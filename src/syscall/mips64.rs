@@ -34,6 +34,9 @@
 // and t1, which still get clobbered.
 use core::arch::asm;
 
+/// System call argument/return type for mips64 (64-bit)
+pub type SyscallWord = u64;
+
 /// Issues a raw system call with 0 arguments.
 ///
 /// # Safety
@@ -41,26 +44,28 @@ use core::arch::asm;
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall0(n: usize) -> usize {
-    let mut err: usize;
-    let mut ret: usize;
-    asm!(
-        "syscall",
-        inlateout("$2") n => ret,
-        lateout("$7") err,
-        // All temporary registers are always clobbered
-        lateout("$8") _,
-        lateout("$9") _,
-        lateout("$10") _,
-        lateout("$11") _,
-        lateout("$12") _,
-        lateout("$13") _,
-        lateout("$14") _,
-        lateout("$15") _,
-        lateout("$24") _,
-        lateout("$25") _,
-        options(nostack, preserves_flags)
-    );
+pub unsafe fn syscall0(n: SyscallWord) -> SyscallWord {
+    let mut err: SyscallWord;
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall",
+            inlateout("$2") n => ret,
+            lateout("$7") err,
+            // All temporary registers are always clobbered
+            lateout("$8") _,
+            lateout("$9") _,
+            lateout("$10") _,
+            lateout("$11") _,
+            lateout("$12") _,
+            lateout("$13") _,
+            lateout("$14") _,
+            lateout("$15") _,
+            lateout("$24") _,
+            lateout("$25") _,
+            options(nostack, preserves_flags)
+        );
+    }
     if err == 0 {
         ret
     } else {
@@ -75,27 +80,29 @@ pub unsafe fn syscall0(n: usize) -> usize {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall1(n: usize, arg1: usize) -> usize {
-    let mut err: usize;
-    let mut ret: usize;
-    asm!(
-        "syscall",
-        inlateout("$2") n => ret,
-        lateout("$7") err,
-        in("$4") arg1,
-        // All temporary registers are always clobbered
-        lateout("$8") _,
-        lateout("$9") _,
-        lateout("$10") _,
-        lateout("$11") _,
-        lateout("$12") _,
-        lateout("$13") _,
-        lateout("$14") _,
-        lateout("$15") _,
-        lateout("$24") _,
-        lateout("$25") _,
-        options(nostack, preserves_flags)
-    );
+pub unsafe fn syscall1(n: SyscallWord, arg1: SyscallWord) -> SyscallWord {
+    let mut err: SyscallWord;
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall",
+            inlateout("$2") n => ret,
+            lateout("$7") err,
+            in("$4") arg1,
+            // All temporary registers are always clobbered
+            lateout("$8") _,
+            lateout("$9") _,
+            lateout("$10") _,
+            lateout("$11") _,
+            lateout("$12") _,
+            lateout("$13") _,
+            lateout("$14") _,
+            lateout("$15") _,
+            lateout("$24") _,
+            lateout("$25") _,
+            options(nostack, preserves_flags)
+        );
+    }
     if err == 0 {
         ret
     } else {
@@ -110,28 +117,30 @@ pub unsafe fn syscall1(n: usize, arg1: usize) -> usize {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall2(n: usize, arg1: usize, arg2: usize) -> usize {
-    let mut err: usize;
-    let mut ret: usize;
-    asm!(
-        "syscall",
-        inlateout("$2") n => ret,
-        lateout("$7") err,
-        in("$4") arg1,
-        in("$5") arg2,
-        // All temporary registers are always clobbered
-        lateout("$8") _,
-        lateout("$9") _,
-        lateout("$10") _,
-        lateout("$11") _,
-        lateout("$12") _,
-        lateout("$13") _,
-        lateout("$14") _,
-        lateout("$15") _,
-        lateout("$24") _,
-        lateout("$25") _,
-        options(nostack, preserves_flags)
-    );
+pub unsafe fn syscall2(n: SyscallWord, arg1: SyscallWord, arg2: SyscallWord) -> SyscallWord {
+    let mut err: SyscallWord;
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall",
+            inlateout("$2") n => ret,
+            lateout("$7") err,
+            in("$4") arg1,
+            in("$5") arg2,
+            // All temporary registers are always clobbered
+            lateout("$8") _,
+            lateout("$9") _,
+            lateout("$10") _,
+            lateout("$11") _,
+            lateout("$12") _,
+            lateout("$13") _,
+            lateout("$14") _,
+            lateout("$15") _,
+            lateout("$24") _,
+            lateout("$25") _,
+            options(nostack, preserves_flags)
+        );
+    }
     if err == 0 {
         ret
     } else {
@@ -147,33 +156,35 @@ pub unsafe fn syscall2(n: usize, arg1: usize, arg2: usize) -> usize {
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall3(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-) -> usize {
-    let mut err: usize;
-    let mut ret: usize;
-    asm!(
-        "syscall",
-        inlateout("$2") n => ret,
-        lateout("$7") err,
-        in("$4") arg1,
-        in("$5") arg2,
-        in("$6") arg3,
-        // All temporary registers are always clobbered
-        lateout("$8") _,
-        lateout("$9") _,
-        lateout("$10") _,
-        lateout("$11") _,
-        lateout("$12") _,
-        lateout("$13") _,
-        lateout("$14") _,
-        lateout("$15") _,
-        lateout("$24") _,
-        lateout("$25") _,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+) -> SyscallWord {
+    let mut err: SyscallWord;
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall",
+            inlateout("$2") n => ret,
+            lateout("$7") err,
+            in("$4") arg1,
+            in("$5") arg2,
+            in("$6") arg3,
+            // All temporary registers are always clobbered
+            lateout("$8") _,
+            lateout("$9") _,
+            lateout("$10") _,
+            lateout("$11") _,
+            lateout("$12") _,
+            lateout("$13") _,
+            lateout("$14") _,
+            lateout("$15") _,
+            lateout("$24") _,
+            lateout("$25") _,
+            options(nostack, preserves_flags)
+        );
+    }
     if err == 0 {
         ret
     } else {
@@ -189,35 +200,37 @@ pub unsafe fn syscall3(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall4(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-) -> usize {
-    let mut err: usize;
-    let mut ret: usize;
-    asm!(
-        "syscall",
-        inlateout("$2") n => ret,
-        in("$4") arg1,
-        in("$5") arg2,
-        in("$6") arg3,
-        // $7 is now used for both input and output.
-        inlateout("$7") arg4 => err,
-        // All temporary registers are always clobbered
-        lateout("$8") _,
-        lateout("$9") _,
-        lateout("$10") _,
-        lateout("$11") _,
-        lateout("$12") _,
-        lateout("$13") _,
-        lateout("$14") _,
-        lateout("$15") _,
-        lateout("$24") _,
-        lateout("$25") _,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+) -> SyscallWord {
+    let mut err: SyscallWord;
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall",
+            inlateout("$2") n => ret,
+            in("$4") arg1,
+            in("$5") arg2,
+            in("$6") arg3,
+            // $7 is now used for both input and output.
+            inlateout("$7") arg4 => err,
+            // All temporary registers are always clobbered
+            lateout("$8") _,
+            lateout("$9") _,
+            lateout("$10") _,
+            lateout("$11") _,
+            lateout("$12") _,
+            lateout("$13") _,
+            lateout("$14") _,
+            lateout("$15") _,
+            lateout("$24") _,
+            lateout("$25") _,
+            options(nostack, preserves_flags)
+        );
+    }
     if err == 0 {
         ret
     } else {
@@ -233,36 +246,38 @@ pub unsafe fn syscall4(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall5(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-    arg5: usize,
-) -> usize {
-    let mut err: usize;
-    let mut ret: usize;
-    asm!(
-        "syscall",
-        inlateout("$2") n => ret,
-        in("$4") arg1,
-        in("$5") arg2,
-        in("$6") arg3,
-        // $7 is now used for both input and output.
-        inlateout("$7") arg4 => err,
-        inlateout("$8") arg5 => _,
-        // All temporary registers are always clobbered
-        lateout("$9") _,
-        lateout("$10") _,
-        lateout("$11") _,
-        lateout("$12") _,
-        lateout("$13") _,
-        lateout("$14") _,
-        lateout("$15") _,
-        lateout("$24") _,
-        lateout("$25") _,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+    arg5: SyscallWord,
+) -> SyscallWord {
+    let mut err: SyscallWord;
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall",
+            inlateout("$2") n => ret,
+            in("$4") arg1,
+            in("$5") arg2,
+            in("$6") arg3,
+            // $7 is now used for both input and output.
+            inlateout("$7") arg4 => err,
+            inlateout("$8") arg5 => _,
+            // All temporary registers are always clobbered
+            lateout("$9") _,
+            lateout("$10") _,
+            lateout("$11") _,
+            lateout("$12") _,
+            lateout("$13") _,
+            lateout("$14") _,
+            lateout("$15") _,
+            lateout("$24") _,
+            lateout("$25") _,
+            options(nostack, preserves_flags)
+        );
+    }
     if err == 0 {
         ret
     } else {
@@ -278,37 +293,39 @@ pub unsafe fn syscall5(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall6(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-    arg5: usize,
-    arg6: usize,
-) -> usize {
-    let mut err: usize;
-    let mut ret: usize;
-    asm!(
-        "syscall",
-        inlateout("$2") n => ret,
-        in("$4") arg1,
-        in("$5") arg2,
-        in("$6") arg3,
-        // $7 is now used for both input and output.
-        inlateout("$7") arg4 => err,
-        inlateout("$8") arg5 => _,
-        inlateout("$9") arg6 => _,
-        // All temporary registers are always clobbered
-        lateout("$10") _,
-        lateout("$11") _,
-        lateout("$12") _,
-        lateout("$13") _,
-        lateout("$14") _,
-        lateout("$15") _,
-        lateout("$24") _,
-        lateout("$25") _,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+    arg5: SyscallWord,
+    arg6: SyscallWord,
+) -> SyscallWord {
+    let mut err: SyscallWord;
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall",
+            inlateout("$2") n => ret,
+            in("$4") arg1,
+            in("$5") arg2,
+            in("$6") arg3,
+            // $7 is now used for both input and output.
+            inlateout("$7") arg4 => err,
+            inlateout("$8") arg5 => _,
+            inlateout("$9") arg6 => _,
+            // All temporary registers are always clobbered
+            lateout("$10") _,
+            lateout("$11") _,
+            lateout("$12") _,
+            lateout("$13") _,
+            lateout("$14") _,
+            lateout("$15") _,
+            lateout("$24") _,
+            lateout("$25") _,
+            options(nostack, preserves_flags)
+        );
+    }
     if err == 0 {
         ret
     } else {

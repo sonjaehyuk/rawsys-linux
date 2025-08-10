@@ -1,12 +1,16 @@
 # Changelog
 
-## v0.7.0 (WIP)
+## v1.0.0 - 2025-08-11
 
-⚠️ **Breaking Changes** ⚠️
- - `syscalls::raw::*` now take a `usize` instead of `Sysno` for the syscall
-   number. This allows bypassing `Sysno` if you need to invoke a syscall that is
-   not in the `Sysno` enum. To migrate existing code, you can cast any `Sysno`
-   type to a `usize` (e.g., `Sysno::openat as usize`).
+> Note: The `syscalls` project has been forked into `rawsys-linux`.
+
+* `syscalls::raw::*` now take `u32` or `u64`(~~`usize`~~) instead of `Sysno` for the syscall number. This allows bypassing `Sysno` if you need to invoke a syscall that is not in the `Sysno` enum. To migrate existing code, you can cast any `Sysno` type to a `u32` or `u64`(~~`usize`~~) (e.g., `Sysno::openat as usize`).
+  * For user convenience, Provide `SyscallWord`, which is a type alias for `u32` or `u64`, instead of `usize`.
+* Updated the project's rust edition to 2024.
+* Completely removed `Deprecated` from existing projects.
+* **It is now possible to select multiple kernel versions as modules, rather than just a single kernel version.**
+  * Adding new kernels has become easier, and users can add kernel versions themselves as needed.
+* Manually reflected the [jw/clippy](https://github.com/jasonwhite/syscalls/tree/jw/clippy) branch and minimized other compiler warnings.
 
 ## v0.6.18
 

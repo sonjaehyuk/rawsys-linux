@@ -1,12 +1,21 @@
-use syscalls::*;
+use rawsys_linux::*;
 
 #[test]
 fn test_syscall() {
+    // Fixed an issue where the STDOUT pipe would break.
     let s = "Hello\0";
+    let fd = unsafe {
+        let at_fdcwd = -100isize;
+        syscall!(Sysno::openat, at_fdcwd, "/dev/null\0".as_ptr(), 2) // The mode value is system-dependent. If your test fails, try changing the mode value first.
+    }
+    .unwrap();
+
     assert_eq!(
-        unsafe { syscall!(Sysno::write, 1, s.as_ptr() as *const _, 6) },
+        unsafe { syscall!(Sysno::write, fd, s.as_ptr() as *const _, 6) },
         Ok(6)
     );
+
+    let _ = unsafe { syscall!(Sysno::close, fd) };
 }
 
 #[test]

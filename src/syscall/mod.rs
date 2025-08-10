@@ -1,3 +1,19 @@
+//! Architecture-specific raw syscall backends
+//!
+//! This module selects and re-exports the appropriate backend for the current
+//! target architecture. Each backend provides a set of inline `asm!` shims that
+//! implement the exact calling convention required by the kernel on that arch.
+//!
+//! - All exported functions are `unsafe`: you are entering the kernel directly.
+//! - Backends are organized per-arch in `src/syscall/*.rs` and compiled
+//!   conditionally with `cfg(target_arch=...)`.
+//! - For ARM, `thumb-mode` is detected by `build.rs` and enabled via a config
+//!   flag so that the correct instruction encoding is generated.
+//!
+//! Unless you are writing arch-specific code, prefer using the top-level
+//! `syscall!`/`raw_syscall!` macros and `syscallN` wrappers re-exported by the
+//! crate root; those pick the correct backend automatically.
+//!
 #[cfg(target_arch = "aarch64")]
 mod aarch64;
 #[cfg(all(

@@ -8,12 +8,22 @@ type DataArray<T> = [MaybeUninit<T>; Sysno::table_size()];
 
 /// A map of syscalls to a type `T`.
 ///
-/// This provides constant-time lookup of syscalls within a static array.
+/// Backed by a static array indexed by the syscall table offset, this provides
+/// O(1) lookups with minimal overhead. Membership is tracked by a companion
+/// `SysnoSet` so that iteration visits only initialized entries.
+///
+/// Intended uses
+/// - Fast dispatch tables (e.g., mapping `Sysno` to handlers).
+/// - Statically initialized description tables via `from_slice`.
+///
+/// Complexity
+/// - `get`/`insert`/`remove`: O(1)
+/// - `iter`/`values`: O(k) where k is the number of set entries
 ///
 /// # Examples
 ///
 /// ```
-/// # use syscalls::{Sysno, SysnoMap};
+/// # use rawsys_linux::{Sysno, SysnoMap};
 /// struct Point { x: i32, y: i32 }
 ///
 /// let mut map = SysnoMap::new();
@@ -23,7 +33,7 @@ type DataArray<T> = [MaybeUninit<T>; Sysno::table_size()];
 ///
 /// Use function callbacks:
 /// ```
-/// # use syscalls::{Sysno, SysnoMap};
+/// # use rawsys_linux::{Sysno, SysnoMap};
 /// let mut map = SysnoMap::<fn() -> i32>::new();
 /// map.insert(Sysno::openat, || 1);
 /// map.insert(Sysno::close, || -1);
@@ -32,7 +42,7 @@ type DataArray<T> = [MaybeUninit<T>; Sysno::table_size()];
 /// ```
 ///
 /// ```
-/// # use syscalls::{Sysno, SysnoMap};
+/// # use rawsys_linux::{Sysno, SysnoMap};
 /// let mut syscalls = SysnoMap::from_iter([
 ///     (Sysno::openat, 0),
 ///     (Sysno::close, 42),
@@ -153,7 +163,7 @@ impl<T> SysnoMap<T> {
     }
 
     /// Returns an iterator that iterates over the syscalls contained in the map.
-    pub fn iter(&self) -> SysnoMapIter<T> {
+    pub fn iter(&self) -> SysnoMapIter<'_, T> {
         SysnoMapIter {
             iter: self.is_set.iter(),
             data: &self.data,
@@ -162,7 +172,7 @@ impl<T> SysnoMap<T> {
 
     /// Returns an iterator that iterates over all enabled values contained in
     /// the map.
-    pub fn values(&self) -> SysnoMapValues<T> {
+    pub fn values(&self) -> SysnoMapValues<'_, T> {
         SysnoMapValues(self.is_set.iter(), &self.data)
     }
 }
@@ -176,7 +186,7 @@ impl<T: Copy> SysnoMap<T> {
     /// # Example
     ///
     /// ```
-    /// use syscalls::{Sysno, SysnoMap};
+    /// use rawsys_linux::{Sysno, SysnoMap};
     ///
     /// static CALLBACKS: SysnoMap<fn() -> i32> = SysnoMap::from_slice(&[
     ///     (Sysno::openat, || 42),

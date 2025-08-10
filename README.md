@@ -50,15 +50,13 @@ architecture.
 
 The *Invoke* column means that syscalls can be invoked for this architecture.
 
-The *Stable Rust?* column means that syscall invocation only requires stable
-Rust. Some architectures require nightly Rust because inline assembly [is not
-yet stabilized for all architectures][asm_experimental_arch].
+The *Stable Rust?* column means that syscall invocation only requires stable Rust. Some architectures require nightly Rust because inline assembly [is not yet stabilized for all architectures][asm_experimental_arch].
 
 [asm_experimental_arch]: https://github.com/rust-lang/rust/issues/93335
 
-|    Arch     | Enum  | Invoke  | Stable Rust?  |
-|:-----------:|:-----:|:-------:|:-------------:|
-|    `arm`\*  |  ✅   |   ✅    |    Yes ✅     |
+|    Arch     | Enum | Invoke | Stable Rust? |
+|:-----------:|:----:|:------:|:------------:|
+|   `arm`\*   |  ✅   |   ✅    |    Yes ✅     |
 |  `aarch64`  |  ✅   |   ✅    |    Yes ✅     |
 |   `mips`    |  ✅   |   ✅    |     No ❌     |
 |  `mips64`   |  ✅   |   ✅    |     No ❌     |
@@ -67,8 +65,8 @@ yet stabilized for all architectures][asm_experimental_arch].
 |  `riscv32`  |  ✅   |   ❌†   |     No ❌     |
 |  `riscv64`  |  ✅   |   ✅    |    Yes ✅     |
 |   `s390x`   |  ✅   |   ✅    |     No ❌     |
-|   `sparc`   |  ✅   |   ❌    |     N/A       |
-|  `sparc64`  |  ✅   |   ❌    |     N/A       |
+|   `sparc`   |  ✅   |   ❌    |     N/A      |
+|  `sparc64`  |  ✅   |   ❌    |     N/A      |
 |    `x86`    |  ✅   |   ✅    |    Yes ✅     |
 |  `x86_64`   |  ✅   |   ✅    |    Yes ✅     |
 
@@ -79,9 +77,12 @@ implemented if you're feeling adventurous.
 
 ## Updating the syscall list
 
-Updates are pulled from the `.tbl` files in the Linux source tree.
+Updates are pulled from the Linux source tree (tables or unistd headers).
 
- 1. Change the Linux version in `syscalls-gen/src/main.rs` to the latest
-    version. Only update to the latest stable version (not release candidates).
- 2. Run `cd syscalls-gen && cargo run`. This will regenerate the syscall tables
-    in `src/arch/`.
+- Generate syscalls for a specific version:
+  - `cd syscalls-gen && cargo run -- --version v6.10`
+- Generate multiple versions and/or specific archs:
+  - `cd syscalls-gen && cargo run -- --versions v6.8,v6.10 --archs x86_64,aarch64`
+
+This will add files under `src/arch/<arch>/vX_Y.rs` (e.g., `src/arch/x86_64/v6_10.rs`).
+The default `mod.rs` chooses which version to expose; adjust it manually as needed.
