@@ -1,4 +1,4 @@
-//! aarch64 architecture syscall definitions.
+//! `aarch64` architecture syscall definitions.
 
 pub mod v6_10;
 

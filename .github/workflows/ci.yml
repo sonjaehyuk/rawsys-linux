@@ -154,11 +154,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
+      - name: Install stable toolchain (with clippy)
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: nightly
           components: clippy
-          override: true
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

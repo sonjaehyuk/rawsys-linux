@@ -14,6 +14,8 @@
 //! `syscall!`/`raw_syscall!` macros and `syscallN` wrappers re-exported by the
 //! crate root; those pick the correct backend automatically.
 //!
+#![allow(clippy::doc_markdown, clippy::pedantic)]
+
 #[cfg(target_arch = "aarch64")]
 mod aarch64;
 #[cfg(all(

@@ -17,9 +17,10 @@ const fn words<T>(bits: usize) -> usize {
         return 0;
     }
 
-    bits / width + ((bits % width != 0) as usize)
+    bits / width + (!bits.is_multiple_of(width) as usize)
 }
 
+#[allow(clippy::doc_markdown)]
 /// A set of syscalls.
 ///
 /// Backed by a compact bitset, this provides constant-time membership checks

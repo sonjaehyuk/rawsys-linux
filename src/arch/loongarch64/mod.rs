@@ -1,4 +1,4 @@
-//! loongarch64 architecture syscall definitions.
+//! `loongarch64` architecture syscall definitions.
 
 pub mod v6_10;
 

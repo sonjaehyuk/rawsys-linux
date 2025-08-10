@@ -1,4 +1,4 @@
-//! SyscallArgs: lightweight packing of syscall parameters
+//! `SyscallArgs`: lightweight packing of syscall parameters
 //!
 //! This module provides the plain container `SyscallArgs` and a helper macro
 //! `syscall_args!` for collecting up to six raw syscall arguments. It is useful

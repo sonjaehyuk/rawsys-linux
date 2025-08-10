@@ -20,6 +20,7 @@
 #[macro_use]
 mod macros;
 
+#[allow(clippy::all, clippy::pedantic)]
 mod generated;
 
 #[cfg(feature = "std")]

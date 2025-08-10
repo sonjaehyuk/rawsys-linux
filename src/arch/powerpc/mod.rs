@@ -1,4 +1,4 @@
-//! powerpc architecture syscall definitions.
+//! `powerpc` architecture syscall definitions.
 
 pub mod v6_10;
 

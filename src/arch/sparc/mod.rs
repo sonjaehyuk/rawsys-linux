@@ -1,4 +1,4 @@
-//! sparc architecture syscall definitions.
+//! `sparc` architecture syscall definitions.
 
 pub mod v6_10;
 

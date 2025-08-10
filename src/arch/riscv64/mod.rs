@@ -1,4 +1,4 @@
-//! riscv64 architecture syscall definitions.
+//! `riscv64` architecture syscall definitions.
 
 pub mod v6_10;
 

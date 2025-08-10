@@ -1,4 +1,4 @@
-//! s390x architecture syscall definitions.
+//! `s390x` architecture syscall definitions.
 
 pub mod v6_10;
 

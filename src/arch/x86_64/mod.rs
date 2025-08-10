@@ -1,4 +1,4 @@
-//! x86_64 architecture syscall definitions.
+//! `x86_64` architecture syscall definitions.
 
 pub mod v6_10;
 

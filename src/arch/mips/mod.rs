@@ -1,4 +1,4 @@
-//! mips architecture syscall definitions.
+//! `mips` architecture syscall definitions.
 
 pub mod v6_10;
 

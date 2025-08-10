@@ -1,4 +1,4 @@
-//! arm architecture syscall definitions.
+//! `arm` architecture syscall definitions.
 
 pub mod v6_10;
 
