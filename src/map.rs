@@ -1,6 +1,6 @@
 use super::Sysno;
-use crate::set::SysnoSetIter;
 use crate::SysnoSet;
+use crate::set::SysnoSetIter;
 use core::fmt;
 use core::mem::MaybeUninit;
 

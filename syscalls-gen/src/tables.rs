@@ -1,10 +1,10 @@
-use crate::{fetch_path, ABI};
-use color_eyre::eyre::{bail, eyre, Result, WrapErr};
+use crate::{ABI, fetch_path};
+use color_eyre::eyre::{Result, WrapErr, bail, eyre};
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::borrow::Cow;
 use std::fmt;
-use std::fs::{create_dir_all, File};
+use std::fs::{File, create_dir_all};
 use std::io::Write;
 use std::path::Path;
 
@@ -129,7 +129,9 @@ impl<'a> Header<'a> {
                         if arch_specific_syscall.is_none() {
                             arch_specific_syscall = Some(id);
                         } else {
-                            bail!("__NR_arch_specific_syscall is defined multiple times")
+                            bail!(
+                                "__NR_arch_specific_syscall is defined multiple times"
+                            )
                         }
                         continue;
                     }
@@ -158,8 +160,10 @@ impl<'a> Header<'a> {
                             entry_point: Some(format!("sys_{name}")),
                         })
                     } else {
-                        bail!("__NR_arch_specific_syscall definition not found before usage. \
-                            Try reordering `Header::headers`?");
+                        bail!(
+                            "__NR_arch_specific_syscall definition not found before usage. \
+                            Try reordering `Header::headers`?"
+                        );
                     }
                 }
             }
@@ -193,7 +197,11 @@ impl<'a> Source<'a> {
     }
 
     /// Generates the source file for a specific arch and kernel version.
-    pub(crate) async fn generate(&self, dir: &Path, version: &str) -> Result<()> {
+    pub(crate) async fn generate(
+        &self,
+        dir: &Path,
+        version: &str,
+    ) -> Result<()> {
         let arch = self.arch();
         let table = self
             .fetch_table(version)

@@ -13,7 +13,6 @@
 // option is specified.
 use core::arch::asm;
 
-
 /// System call argument/return type for x86
 pub type SyscallWord = u32;
 
@@ -63,7 +62,11 @@ pub unsafe fn syscall1(n: SyscallWord, arg1: SyscallWord) -> SyscallWord {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall2(n: SyscallWord, arg1: SyscallWord, arg2: SyscallWord) -> SyscallWord {
+pub unsafe fn syscall2(
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+) -> SyscallWord {
     let mut ret: SyscallWord;
     unsafe {
         asm!(

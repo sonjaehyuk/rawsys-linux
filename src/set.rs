@@ -103,7 +103,9 @@ impl SysnoSet {
     /// `SysnoSet::ALL` directly when you only need membership checks to avoid
     /// copying the entire array.
     pub const fn all() -> Self {
-        Self { data: Self::ALL.data }
+        Self {
+            data: Self::ALL.data,
+        }
     }
 
     /// Returns true if the set contains the given syscall.

@@ -66,11 +66,7 @@ pub unsafe fn syscall0(n: SyscallWord) -> SyscallWord {
             options(nostack, preserves_flags)
         );
     }
-    if err == 0 {
-        ret
-    } else {
-        ret.wrapping_neg()
-    }
+    if err == 0 { ret } else { ret.wrapping_neg() }
 }
 
 /// Issues a raw system call with 1 argument.
@@ -103,11 +99,7 @@ pub unsafe fn syscall1(n: SyscallWord, arg1: SyscallWord) -> SyscallWord {
             options(nostack, preserves_flags)
         );
     }
-    if err == 0 {
-        ret
-    } else {
-        ret.wrapping_neg()
-    }
+    if err == 0 { ret } else { ret.wrapping_neg() }
 }
 
 /// Issues a raw system call with 2 arguments.
@@ -117,7 +109,11 @@ pub unsafe fn syscall1(n: SyscallWord, arg1: SyscallWord) -> SyscallWord {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall2(n: SyscallWord, arg1: SyscallWord, arg2: SyscallWord) -> SyscallWord {
+pub unsafe fn syscall2(
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+) -> SyscallWord {
     let mut err: SyscallWord;
     let mut ret: SyscallWord;
     unsafe {
@@ -141,11 +137,7 @@ pub unsafe fn syscall2(n: SyscallWord, arg1: SyscallWord, arg2: SyscallWord) -> 
             options(nostack, preserves_flags)
         );
     }
-    if err == 0 {
-        ret
-    } else {
-        ret.wrapping_neg()
-    }
+    if err == 0 { ret } else { ret.wrapping_neg() }
 }
 
 /// Issues a raw system call with 3 arguments.
@@ -185,11 +177,7 @@ pub unsafe fn syscall3(
             options(nostack, preserves_flags)
         );
     }
-    if err == 0 {
-        ret
-    } else {
-        ret.wrapping_neg()
-    }
+    if err == 0 { ret } else { ret.wrapping_neg() }
 }
 
 /// Issues a raw system call with 4 arguments.
@@ -231,11 +219,7 @@ pub unsafe fn syscall4(
             options(nostack, preserves_flags)
         );
     }
-    if err == 0 {
-        ret
-    } else {
-        ret.wrapping_neg()
-    }
+    if err == 0 { ret } else { ret.wrapping_neg() }
 }
 
 /// Issues a raw system call with 5 arguments.
@@ -278,11 +262,7 @@ pub unsafe fn syscall5(
             options(nostack, preserves_flags)
         );
     }
-    if err == 0 {
-        ret
-    } else {
-        ret.wrapping_neg()
-    }
+    if err == 0 { ret } else { ret.wrapping_neg() }
 }
 
 /// Issues a raw system call with 6 arguments.
@@ -326,9 +306,5 @@ pub unsafe fn syscall6(
             options(nostack, preserves_flags)
         );
     }
-    if err == 0 {
-        ret
-    } else {
-        ret.wrapping_neg()
-    }
+    if err == 0 { ret } else { ret.wrapping_neg() }
 }

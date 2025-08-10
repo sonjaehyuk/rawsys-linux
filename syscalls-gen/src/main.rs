@@ -2,7 +2,7 @@
 #![allow(clippy::upper_case_acronyms)]
 
 use crate::tables::Source;
-use color_eyre::eyre::{eyre, Result, WrapErr};
+use color_eyre::eyre::{Result, WrapErr, eyre};
 use futures::future::try_join_all;
 use lazy_static::lazy_static;
 use std::collections::HashSet;

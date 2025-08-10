@@ -40,7 +40,7 @@ pub use args::SyscallArgs;
 pub use errno::{Errno, ErrnoSentinel};
 pub use map::*;
 pub use set::*;
-pub use syscall::{SyscallWord};
+pub use syscall::SyscallWord;
 
 pub mod raw {
     //! Exposes raw syscalls that simply return a `SyscallWord` instead of a `Result`.
@@ -87,10 +87,16 @@ pub unsafe fn syscall0(nr: Sysno) -> Result<SyscallWord, Errno> {
     #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "64"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "64"
+    ))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "32"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "32"
+    ))]
     return Errno::from_ret_u32(ret as u32);
 }
 
@@ -101,17 +107,26 @@ pub unsafe fn syscall0(nr: Sysno) -> Result<SyscallWord, Errno> {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall1(nr: Sysno, a1: SyscallWord) -> Result<SyscallWord, Errno> {
+pub unsafe fn syscall1(
+    nr: Sysno,
+    a1: SyscallWord,
+) -> Result<SyscallWord, Errno> {
     let ret = unsafe { raw::syscall1(nr as SyscallWord, a1) };
 
     // x86_64 x32 ABI
     #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "64"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "64"
+    ))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "32"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "32"
+    ))]
     return Errno::from_ret_u32(ret as u32);
 }
 
@@ -133,10 +148,16 @@ pub unsafe fn syscall2(
     #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "64"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "64"
+    ))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "32"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "32"
+    ))]
     return Errno::from_ret_u32(ret as u32);
 }
 
@@ -159,10 +180,16 @@ pub unsafe fn syscall3(
     #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "64"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "64"
+    ))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "32"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "32"
+    ))]
     return Errno::from_ret_u32(ret as u32);
 }
 
@@ -186,10 +213,16 @@ pub unsafe fn syscall4(
     #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "64"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "64"
+    ))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "32"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "32"
+    ))]
     return Errno::from_ret_u32(ret as u32);
 }
 
@@ -214,10 +247,16 @@ pub unsafe fn syscall5(
     #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "64"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "64"
+    ))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "32"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "32"
+    ))]
     return Errno::from_ret_u32(ret as u32);
 }
 
@@ -237,16 +276,23 @@ pub unsafe fn syscall6(
     a5: SyscallWord,
     a6: SyscallWord,
 ) -> Result<SyscallWord, Errno> {
-    let ret = unsafe { raw::syscall6(nr as SyscallWord, a1, a2, a3, a4, a5, a6) };
+    let ret =
+        unsafe { raw::syscall6(nr as SyscallWord, a1, a2, a3, a4, a5, a6) };
 
     // x86_64 x32 ABI
     #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "64"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "64"
+    ))]
     return Errno::from_ret_u64(ret as u64);
 
-    #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "32"))]
+    #[cfg(all(
+        not(all(target_arch = "x86_64", target_pointer_width = "32")),
+        target_pointer_width = "32"
+    ))]
     return Errno::from_ret_u32(ret as u32);
 }
 
@@ -264,10 +310,14 @@ pub unsafe fn syscall6(
 ///
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
-pub unsafe fn syscall(nr: Sysno, args: &SyscallArgs) -> Result<SyscallWord, Errno> {
+pub unsafe fn syscall(
+    nr: Sysno,
+    args: &SyscallArgs,
+) -> Result<SyscallWord, Errno> {
     unsafe {
         syscall6(
-            nr, args.arg0, args.arg1, args.arg2, args.arg3, args.arg4, args.arg5,
+            nr, args.arg0, args.arg1, args.arg2, args.arg3, args.arg4,
+            args.arg5,
         )
     }
 }
@@ -322,11 +372,18 @@ mod tests {
         let mut buffer1: [u8; 64] = unsafe { core::mem::zeroed() };
         let mut buffer2: [u8; 64] = unsafe { core::mem::zeroed() };
 
-        let args = SyscallArgs::from(&[fd as SyscallWord, buffer1.as_mut_ptr() as _, 64]);
+        let args = SyscallArgs::from(&[
+            fd as SyscallWord,
+            buffer1.as_mut_ptr() as _,
+            64,
+        ]);
         let r1 = unsafe { syscall(Sysno::read, &args) }.expect("read failed");
 
         let s1 = unsafe {
-            core::slice::from_raw_parts(buffer1.as_mut_ptr() as *const u8, r1 as usize)
+            core::slice::from_raw_parts(
+                buffer1.as_mut_ptr() as *const u8,
+                r1 as usize,
+            )
         };
         let r2 = unsafe { syscall!(Sysno::read, fd, buffer2.as_mut_ptr(), 64) };
         let s2 = unsafe {

@@ -31,4 +31,3 @@ fn sysno_new_roundtrip_all_iter() {
         assert_eq!(Sysno::new(id), Some(s));
     }
 }
-
