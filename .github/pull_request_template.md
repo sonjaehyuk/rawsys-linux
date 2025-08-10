@@ -15,7 +15,10 @@
 ## Checklist
 Please confirm the following before submitting:
 
-- [ ] This change does **not** introduce unnecessary new features unrelated to stability.
+- [ ] I have run **`cargo fmt`** (stable toolchain) to format the code.
+  - [ ] I understand that indentation uses **4 spaces** (cargo fmt will enforce this automatically, but please be aware).
+- [ ] I have run **`cargo clippy`** (stable toolchain) and resolved warnings.
+- [ ] This change follows the **mod.rs-based module declaration style**.
 - [ ] I have tested this change on all relevant architectures and kernel versions.
 - [ ] Inline assembly changes (if any) are reviewed for correctness and portability.
 - [ ] Documentation has been updated (if applicable).
