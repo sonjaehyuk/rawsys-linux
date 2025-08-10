@@ -14,13 +14,13 @@ fn invalid_syscall_returns_enosys() {
 
     // Convert according to the ABI return width.
     #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
-    let res = rl::Errno::from_ret_u64(ret as u64);
+    let res = rawsys_linux::Errno::from_ret_u64(ret as u64);
 
     #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "64"))]
     let res = rawsys_linux::Errno::from_ret_u64(ret as u64);
 
     #[cfg(all(not(all(target_arch = "x86_64", target_pointer_width = "32")), target_pointer_width = "32"))]
-    let res = rl::Errno::from_ret_u32(ret as u32);
+    let res = rawsys_linux::Errno::from_ret_u32(ret as u32);
 
     assert_eq!(res, Err(rawsys_linux::Errno::ENOSYS));
 }
