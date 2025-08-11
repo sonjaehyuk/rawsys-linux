@@ -25,7 +25,9 @@ fn main() {
             enabled_kernels
         );
     } else if enabled_kernels == 0 {
-        println!("cargo:warning=No default_kernel_* feature explicitly set; build will rely on code-side defaults.");
+        println!(
+            "No default_kernel_* feature explicitly set; build will rely on code-side defaults."
+        );
     }
 
     // Automatically detect if thumb-mode is an available feature by looking at
