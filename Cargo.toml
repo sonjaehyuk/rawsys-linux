@@ -5,16 +5,17 @@ authors = ["Jaehyuk Son <github@reception.sonjaehyuk.me>"]
 edition = "2024"
 license = "BSD-2-Clause"
 description = """
-A list of Linux system calls.
+Direct Linux kernel syscalls in Rust — no libc required, per-ISA and multi-version aware.
 """
-keywords = ["syscall", "linux"]
+keywords = ["syscall", "linux", "inline-assembly", "kernel", "no-libc"]
+categories = ["os::linux-apis", "no-std"]
 readme = "README.md"
 repository = "https://github.com/sonjaehyuk/rawsys-linux"
 homepage = "https://github.com/sonjaehyuk/rawsys-linux"
 # documentation = "https://docs.rs/syscalls"
 
 [features]
-default = ["std", "serde", "kernel_6_12"]
+default = ["std", "serde"]
 
 # Enables all extra features.
 full = ["std", "serde", "all"]
@@ -53,13 +54,13 @@ thumb-mode = []
 
 # Kernel version selection (pick exactly one).
 # By default, we target Linux 6.12 across all ISAs.
-kernel_5_4 = []
-kernel_5_10 = []
-kernel_5_15 = []
-kernel_6_1 = []
-kernel_6_6 = []
-kernel_6_10 = []
-kernel_6_12 = []
+default_kernel_5_4 = []
+default_kernel_5_10 = []
+default_kernel_5_15 = []
+default_kernel_6_1 = []
+default_kernel_6_6 = []
+default_kernel_6_10 = []
+default_kernel_6_12 = []
 
 [dependencies]
 serde = { version = "1.0", default-features = false, features = ["derive"], optional = true }
@@ -75,5 +76,7 @@ members = [
 ]
 
 [package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "doc_cfg"]
+features = ["std", "serde", "all", "default_kernel_6_12"]
+no-default-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+targets = ["x86_64-unknown-linux-gnu"]
