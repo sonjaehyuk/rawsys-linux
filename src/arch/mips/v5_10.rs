@@ -38,8 +38,8 @@ syscall_enum! {
         chmod = 4015,
         /// See [lchown(2)](https://man7.org/linux/man-pages/man2/lchown.2.html) for more info on this syscall.
         lchown = 4016,
-        /// See [r#break(2)](https://man7.org/linux/man-pages/man2/r#break.2.html) for more info on this syscall.
-        r#break = 4017,
+        /// See [break(2)](https://man7.org/linux/man-pages/man2/break.2.html) for more info on this syscall.
+        break_ = 4017,
         /// See [unused18(2)](https://man7.org/linux/man-pages/man2/unused18.2.html) for more info on this syscall.
         unused18 = 4018,
         /// See [lseek(2)](https://man7.org/linux/man-pages/man2/lseek.2.html) for more info on this syscall.

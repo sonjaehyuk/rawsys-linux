@@ -38,8 +38,8 @@ syscall_enum! {
         chmod = 15,
         /// See [lchown(2)](https://man7.org/linux/man-pages/man2/lchown.2.html) for more info on this syscall.
         lchown = 16,
-        /// NOTE: `r#break` is not implemented in the kernel.
-        r#break = 17,
+        /// NOTE: `break` is not implemented in the kernel.
+        break_ = 17,
         /// See [oldstat(2)](https://man7.org/linux/man-pages/man2/oldstat.2.html) for more info on this syscall.
         oldstat = 18,
         /// See [lseek(2)](https://man7.org/linux/man-pages/man2/lseek.2.html) for more info on this syscall.

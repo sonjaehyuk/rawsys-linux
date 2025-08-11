@@ -36,10 +36,47 @@ pub struct TableEntry {
 
 impl TableEntry {
     fn ident(&self) -> Cow<str> {
-        if self.name.as_str() == "break" {
-            Cow::Owned(format!("r#{}", self.name))
-        } else {
+        // Produce a Rust identifier without using raw id syntax (r#...).
+        // 1) Replace any non [A-Za-z0-9_] with '_'.
+        // 2) If it starts with a digit, prefix with '_'.
+        // 3) If it matches a Rust reserved keyword, append an underscore.
+        let mut out: String = self
+            .name
+            .chars()
+            .map(|c| match c {
+                'a'..='z' | 'A'..='Z' | '0'..='9' | '_' => c,
+                _ => '_',
+            })
+            .collect();
+
+        if out
+            .chars()
+            .next()
+            .map(|c| c.is_ascii_digit())
+            .unwrap_or(false)
+        {
+            out.insert(0, '_');
+        }
+
+        // Rust reserved keywords (2018 edition + reserved).
+        const KEYWORDS: &[&str] = &[
+            "as", "break", "const", "continue", "crate", "else", "enum",
+            "extern", "false", "fn", "for", "if", "impl", "in", "let", "loop",
+            "match", "mod", "move", "mut", "pub", "ref", "return", "self",
+            "Self", "static", "struct", "super", "trait", "true", "type",
+            "unsafe", "use", "where", "while", "async", "await", "dyn",
+            "abstract", "become", "box", "do", "final", "macro", "override",
+            "priv", "try", "typeof", "unsized", "virtual", "yield",
+        ];
+
+        if KEYWORDS.contains(&out.as_str()) {
+            out.push('_');
+        }
+
+        if out == self.name {
             Cow::Borrowed(&self.name)
+        } else {
+            Cow::Owned(out)
         }
     }
 }
@@ -247,7 +284,7 @@ impl<'a> fmt::Display for SyscallFile<'a> {
                 writeln!(
                     f,
                     "        /// See [{name}(2)](https://man7.org/linux/man-pages/man2/{name}.2.html) for more info on this syscall.",
-                    name = entry.ident(),
+                    name = entry.name,
                 )?;
                 writeln!(
                     f,
@@ -264,7 +301,7 @@ impl<'a> fmt::Display for SyscallFile<'a> {
                 writeln!(
                     f,
                     "        /// NOTE: `{name}` is not implemented in the kernel.",
-                    name = entry.ident(),
+                    name = entry.name,
                 )?;
                 writeln!(
                     f,
