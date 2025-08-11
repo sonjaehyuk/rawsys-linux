@@ -42,6 +42,9 @@
 
 use core::arch::asm;
 
+/// System call argument/return type for loongarch64 (64-bit)
+pub type SyscallWord = u64;
+
 /// Issues a raw system call with 0 arguments.
 ///
 /// # Safety
@@ -49,24 +52,26 @@ use core::arch::asm;
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall0(n: usize) -> usize {
-    let mut ret: usize;
-    asm!(
-        "syscall 0",
-        in("$a7") n,
-        lateout("$a0") ret,
-        // All temporary registers are always clobbered
-        lateout("$t0") _,
-        lateout("$t1") _,
-        lateout("$t2") _,
-        lateout("$t3") _,
-        lateout("$t4") _,
-        lateout("$t5") _,
-        lateout("$t6") _,
-        lateout("$t7") _,
-        lateout("$t8") _,
-        options(nostack, preserves_flags)
-    );
+pub unsafe fn syscall0(n: SyscallWord) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall 0",
+            in("$a7") n,
+            lateout("$a0") ret,
+            // All temporary registers are always clobbered
+            lateout("$t0") _,
+            lateout("$t1") _,
+            lateout("$t2") _,
+            lateout("$t3") _,
+            lateout("$t4") _,
+            lateout("$t5") _,
+            lateout("$t6") _,
+            lateout("$t7") _,
+            lateout("$t8") _,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -77,24 +82,26 @@ pub unsafe fn syscall0(n: usize) -> usize {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall1(n: usize, arg1: usize) -> usize {
-    let mut ret: usize;
-    asm!(
-        "syscall 0",
-        in("$a7") n,
-        inlateout("$a0") arg1 => ret,
-        // All temporary registers are always clobbered
-        lateout("$t0") _,
-        lateout("$t1") _,
-        lateout("$t2") _,
-        lateout("$t3") _,
-        lateout("$t4") _,
-        lateout("$t5") _,
-        lateout("$t6") _,
-        lateout("$t7") _,
-        lateout("$t8") _,
-        options(nostack, preserves_flags)
-    );
+pub unsafe fn syscall1(n: SyscallWord, arg1: SyscallWord) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall 0",
+            in("$a7") n,
+            inlateout("$a0") arg1 => ret,
+            // All temporary registers are always clobbered
+            lateout("$t0") _,
+            lateout("$t1") _,
+            lateout("$t2") _,
+            lateout("$t3") _,
+            lateout("$t4") _,
+            lateout("$t5") _,
+            lateout("$t6") _,
+            lateout("$t7") _,
+            lateout("$t8") _,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -105,25 +112,31 @@ pub unsafe fn syscall1(n: usize, arg1: usize) -> usize {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall2(n: usize, arg1: usize, arg2: usize) -> usize {
-    let mut ret: usize;
-    asm!(
-        "syscall 0",
-        in("$a7") n,
-        inlateout("$a0") arg1 => ret,
-        in("$a1") arg2,
-        // All temporary registers are always clobbered
-        lateout("$t0") _,
-        lateout("$t1") _,
-        lateout("$t2") _,
-        lateout("$t3") _,
-        lateout("$t4") _,
-        lateout("$t5") _,
-        lateout("$t6") _,
-        lateout("$t7") _,
-        lateout("$t8") _,
-        options(nostack, preserves_flags)
-    );
+pub unsafe fn syscall2(
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall 0",
+            in("$a7") n,
+            inlateout("$a0") arg1 => ret,
+            in("$a1") arg2,
+            // All temporary registers are always clobbered
+            lateout("$t0") _,
+            lateout("$t1") _,
+            lateout("$t2") _,
+            lateout("$t3") _,
+            lateout("$t4") _,
+            lateout("$t5") _,
+            lateout("$t6") _,
+            lateout("$t7") _,
+            lateout("$t8") _,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -135,30 +148,32 @@ pub unsafe fn syscall2(n: usize, arg1: usize, arg2: usize) -> usize {
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall3(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "syscall 0",
-        in("$a7") n,
-        inlateout("$a0") arg1 => ret,
-        in("$a1") arg2,
-        in("$a2") arg3,
-        // All temporary registers are always clobbered
-        lateout("$t0") _,
-        lateout("$t1") _,
-        lateout("$t2") _,
-        lateout("$t3") _,
-        lateout("$t4") _,
-        lateout("$t5") _,
-        lateout("$t6") _,
-        lateout("$t7") _,
-        lateout("$t8") _,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall 0",
+            in("$a7") n,
+            inlateout("$a0") arg1 => ret,
+            in("$a1") arg2,
+            in("$a2") arg3,
+            // All temporary registers are always clobbered
+            lateout("$t0") _,
+            lateout("$t1") _,
+            lateout("$t2") _,
+            lateout("$t3") _,
+            lateout("$t4") _,
+            lateout("$t5") _,
+            lateout("$t6") _,
+            lateout("$t7") _,
+            lateout("$t8") _,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -170,32 +185,34 @@ pub unsafe fn syscall3(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall4(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "syscall 0",
-        in("$a7") n,
-        inlateout("$a0") arg1 => ret,
-        in("$a1") arg2,
-        in("$a2") arg3,
-        in("$a3") arg4,
-        // All temporary registers are always clobbered
-        lateout("$t0") _,
-        lateout("$t1") _,
-        lateout("$t2") _,
-        lateout("$t3") _,
-        lateout("$t4") _,
-        lateout("$t5") _,
-        lateout("$t6") _,
-        lateout("$t7") _,
-        lateout("$t8") _,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall 0",
+            in("$a7") n,
+            inlateout("$a0") arg1 => ret,
+            in("$a1") arg2,
+            in("$a2") arg3,
+            in("$a3") arg4,
+            // All temporary registers are always clobbered
+            lateout("$t0") _,
+            lateout("$t1") _,
+            lateout("$t2") _,
+            lateout("$t3") _,
+            lateout("$t4") _,
+            lateout("$t5") _,
+            lateout("$t6") _,
+            lateout("$t7") _,
+            lateout("$t8") _,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -207,34 +224,36 @@ pub unsafe fn syscall4(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall5(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-    arg5: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "syscall 0",
-        in("$a7") n,
-        inlateout("$a0") arg1 => ret,
-        in("$a1") arg2,
-        in("$a2") arg3,
-        in("$a3") arg4,
-        in("$a4") arg5,
-        // All temporary registers are always clobbered
-        lateout("$t0") _,
-        lateout("$t1") _,
-        lateout("$t2") _,
-        lateout("$t3") _,
-        lateout("$t4") _,
-        lateout("$t5") _,
-        lateout("$t6") _,
-        lateout("$t7") _,
-        lateout("$t8") _,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+    arg5: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall 0",
+            in("$a7") n,
+            inlateout("$a0") arg1 => ret,
+            in("$a1") arg2,
+            in("$a2") arg3,
+            in("$a3") arg4,
+            in("$a4") arg5,
+            // All temporary registers are always clobbered
+            lateout("$t0") _,
+            lateout("$t1") _,
+            lateout("$t2") _,
+            lateout("$t3") _,
+            lateout("$t4") _,
+            lateout("$t5") _,
+            lateout("$t6") _,
+            lateout("$t7") _,
+            lateout("$t8") _,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -246,35 +265,37 @@ pub unsafe fn syscall5(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall6(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-    arg5: usize,
-    arg6: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "syscall 0",
-        in("$a7") n,
-        inlateout("$a0") arg1 => ret,
-        in("$a1") arg2,
-        in("$a2") arg3,
-        in("$a3") arg4,
-        in("$a4") arg5,
-        in("$a5") arg6,
-        // All temporary registers are always clobbered
-        lateout("$t0") _,
-        lateout("$t1") _,
-        lateout("$t2") _,
-        lateout("$t3") _,
-        lateout("$t4") _,
-        lateout("$t5") _,
-        lateout("$t6") _,
-        lateout("$t7") _,
-        lateout("$t8") _,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+    arg5: SyscallWord,
+    arg6: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "syscall 0",
+            in("$a7") n,
+            inlateout("$a0") arg1 => ret,
+            in("$a1") arg2,
+            in("$a2") arg3,
+            in("$a3") arg4,
+            in("$a4") arg5,
+            in("$a5") arg6,
+            // All temporary registers are always clobbered
+            lateout("$t0") _,
+            lateout("$t1") _,
+            lateout("$t2") _,
+            lateout("$t3") _,
+            lateout("$t4") _,
+            lateout("$t5") _,
+            lateout("$t6") _,
+            lateout("$t7") _,
+            lateout("$t8") _,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }

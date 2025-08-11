@@ -1,3 +1,7 @@
 target/
 **/*.rs.bk
 Cargo.lock
+CLAUDE.md
+.idea
+.vs
+.vscode

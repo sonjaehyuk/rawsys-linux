@@ -1,17 +1,18 @@
 [package]
-name = "syscalls"
-version = "0.6.18"
-authors = ["Jason White <rust@jasonwhite.io>", "Baojun Wang <wangbj@gmail.com>"]
-edition = "2021"
+name = "rawsys-linux"
+version = "1.0.0"
+authors = ["Jaehyuk Son <github@reception.sonjaehyuk.me>"]
+edition = "2024"
 license = "BSD-2-Clause"
 description = """
-A list of Linux system calls.
+Direct Linux kernel syscalls in Rust — no libc required, per-ISA and multi-version aware.
 """
-keywords = ["syscall", "linux"]
+keywords = ["syscall", "linux", "inline-assembly", "kernel", "no-libc"]
+categories = ["os::linux-apis", "no-std"]
 readme = "README.md"
-repository = "https://github.com/jasonwhite/syscalls"
-homepage = "https://github.com/jasonwhite/syscalls"
-documentation = "https://docs.rs/syscalls"
+repository = "https://github.com/sonjaehyuk/rawsys-linux"
+homepage = "https://github.com/sonjaehyuk/rawsys-linux"
+# documentation = "https://docs.rs/syscalls"
 
 [features]
 default = ["std", "serde"]
@@ -44,11 +45,22 @@ sparc64 = []
 x86 = []
 x86_64 = []
 
-# Deprecated: Use `serde` instead.
-with-serde = ["serde", "serde_repr"]
-
 # Enables Serialize/Deserialize impls.
 serde = ["dep:serde", "serde_repr"]
+
+# Generates instructions that are compatible with thumb-mode. This is set
+# automatically by `build.rs` if the target supports thumb-mode.
+thumb-mode = []
+
+# Kernel version selection (pick exactly one).
+# By default, we target Linux 6.12 across all ISAs.
+default_kernel_5_4 = []
+default_kernel_5_10 = []
+default_kernel_5_15 = []
+default_kernel_6_1 = []
+default_kernel_6_6 = []
+default_kernel_6_10 = []
+default_kernel_6_12 = []
 
 [dependencies]
 serde = { version = "1.0", default-features = false, features = ["derive"], optional = true }
@@ -64,5 +76,7 @@ members = [
 ]
 
 [package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "doc_cfg"]
+features = ["std", "serde", "all", "default_kernel_6_12"]
+no-default-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+targets = ["x86_64-unknown-linux-gnu"]

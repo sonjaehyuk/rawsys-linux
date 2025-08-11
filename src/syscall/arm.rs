@@ -13,6 +13,9 @@
 // No other registers are clobbered.
 use core::arch::asm;
 
+/// System call argument/return type for ARM (32-bit)
+pub type SyscallWord = u32;
+
 /// Issues a raw system call with 0 arguments.
 ///
 /// # Safety
@@ -20,14 +23,16 @@ use core::arch::asm;
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall0(n: usize) -> usize {
-    let mut ret: usize;
-    asm!(
-        "svc 0",
-        in("r7") n,
-        lateout("r0") ret,
-        options(nostack, preserves_flags)
-    );
+pub unsafe fn syscall0(n: SyscallWord) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "svc 0",
+            in("r7") n,
+            lateout("r0") ret,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -38,14 +43,16 @@ pub unsafe fn syscall0(n: usize) -> usize {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall1(n: usize, arg1: usize) -> usize {
-    let mut ret: usize;
-    asm!(
-        "svc 0",
-        in("r7") n,
-        inlateout("r0") arg1 => ret,
-        options(nostack, preserves_flags)
-    );
+pub unsafe fn syscall1(n: SyscallWord, arg1: SyscallWord) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "svc 0",
+            in("r7") n,
+            inlateout("r0") arg1 => ret,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -56,15 +63,21 @@ pub unsafe fn syscall1(n: usize, arg1: usize) -> usize {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall2(n: usize, arg1: usize, arg2: usize) -> usize {
-    let mut ret: usize;
-    asm!(
-        "svc 0",
-        in("r7") n,
-        inlateout("r0") arg1 => ret,
-        in("r1") arg2,
-        options(nostack, preserves_flags)
-    );
+pub unsafe fn syscall2(
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "svc 0",
+            in("r7") n,
+            inlateout("r0") arg1 => ret,
+            in("r1") arg2,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -76,20 +89,22 @@ pub unsafe fn syscall2(n: usize, arg1: usize, arg2: usize) -> usize {
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall3(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "svc 0",
-        in("r7") n,
-        inlateout("r0") arg1 => ret,
-        in("r1") arg2,
-        in("r2") arg3,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "svc 0",
+            in("r7") n,
+            inlateout("r0") arg1 => ret,
+            in("r1") arg2,
+            in("r2") arg3,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -101,22 +116,24 @@ pub unsafe fn syscall3(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall4(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "svc 0",
-        in("r7") n,
-        inlateout("r0") arg1 => ret,
-        in("r1") arg2,
-        in("r2") arg3,
-        in("r3") arg4,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "svc 0",
+            in("r7") n,
+            inlateout("r0") arg1 => ret,
+            in("r1") arg2,
+            in("r2") arg3,
+            in("r3") arg4,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -128,24 +145,26 @@ pub unsafe fn syscall4(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall5(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-    arg5: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "svc 0",
-        in("r7") n,
-        inlateout("r0") arg1 => ret,
-        in("r1") arg2,
-        in("r2") arg3,
-        in("r3") arg4,
-        in("r4") arg5,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+    arg5: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "svc 0",
+            in("r7") n,
+            inlateout("r0") arg1 => ret,
+            in("r1") arg2,
+            in("r2") arg3,
+            in("r3") arg4,
+            in("r4") arg5,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }
 
@@ -157,25 +176,27 @@ pub unsafe fn syscall5(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall6(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-    arg5: usize,
-    arg6: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "svc 0",
-        in("r7") n,
-        inlateout("r0") arg1 => ret,
-        in("r1") arg2,
-        in("r2") arg3,
-        in("r3") arg4,
-        in("r4") arg5,
-        in("r5") arg6,
-        options(nostack, preserves_flags)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+    arg5: SyscallWord,
+    arg6: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "svc 0",
+            in("r7") n,
+            inlateout("r0") arg1 => ret,
+            in("r1") arg2,
+            in("r2") arg3,
+            in("r3") arg4,
+            in("r4") arg5,
+            in("r5") arg6,
+            options(nostack, preserves_flags)
+        );
+    }
     ret
 }

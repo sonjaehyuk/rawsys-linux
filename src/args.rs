@@ -1,28 +1,45 @@
-//! Provide helper functions/trait impls to pack/unpack
-//! [`SyscallArgs`].
+//! `SyscallArgs`: lightweight packing of syscall parameters
 //!
-//! `io:Error` is not implemented for better `no_std` support.
+//! This module provides the plain container `SyscallArgs` and a helper macro
+//! `syscall_args!` for collecting up to six raw syscall arguments. It is useful
+//! when you want to prepare arguments programmatically and call the generic
+//! `syscall(nr, &SyscallArgs)` wrapper.
+//!
+//! Notes
+//! - Kept intentionally untyped: the kernel ABI is in terms of machine words;
+//!   `SyscallArgs` mirrors that to avoid accidental conversions or allocations.
+//! - `no_std` friendly by design; no dependency on `std::io::Error`.
+//!
+//! Example
+//! ```no_run
+//! use rawsys_linux::{Sysno, SyscallArgs, syscall};
+//!
+//! let args = SyscallArgs::from(&[1, b"hi\n".as_ptr() as _, 3]);
+//! let _ = unsafe { syscall(Sysno::write, &args) };
+//! ```
+
+use crate::SyscallWord;
 
 /// The 6 arguments of a syscall, raw untyped version.
 #[derive(PartialEq, Debug, Eq, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SyscallArgs {
-    pub arg0: usize,
-    pub arg1: usize,
-    pub arg2: usize,
-    pub arg3: usize,
-    pub arg4: usize,
-    pub arg5: usize,
+    pub arg0: SyscallWord,
+    pub arg1: SyscallWord,
+    pub arg2: SyscallWord,
+    pub arg3: SyscallWord,
+    pub arg4: SyscallWord,
+    pub arg5: SyscallWord,
 }
 
 impl SyscallArgs {
     pub fn new(
-        a0: usize,
-        a1: usize,
-        a2: usize,
-        a3: usize,
-        a4: usize,
-        a5: usize,
+        a0: SyscallWord,
+        a1: SyscallWord,
+        a2: SyscallWord,
+        a3: SyscallWord,
+        a4: SyscallWord,
+        a5: SyscallWord,
     ) -> Self {
         SyscallArgs {
             arg0: a0,
@@ -35,8 +52,8 @@ impl SyscallArgs {
     }
 }
 
-impl From<&[usize; 6]> for SyscallArgs {
-    fn from(args: &[usize; 6]) -> Self {
+impl From<&[SyscallWord; 6]> for SyscallArgs {
+    fn from(args: &[SyscallWord; 6]) -> Self {
         SyscallArgs {
             arg0: args[0],
             arg1: args[1],
@@ -48,8 +65,8 @@ impl From<&[usize; 6]> for SyscallArgs {
     }
 }
 
-impl From<&[usize; 5]> for SyscallArgs {
-    fn from(args: &[usize; 5]) -> Self {
+impl From<&[SyscallWord; 5]> for SyscallArgs {
+    fn from(args: &[SyscallWord; 5]) -> Self {
         SyscallArgs {
             arg0: args[0],
             arg1: args[1],
@@ -61,8 +78,8 @@ impl From<&[usize; 5]> for SyscallArgs {
     }
 }
 
-impl From<&[usize; 4]> for SyscallArgs {
-    fn from(args: &[usize; 4]) -> Self {
+impl From<&[SyscallWord; 4]> for SyscallArgs {
+    fn from(args: &[SyscallWord; 4]) -> Self {
         SyscallArgs {
             arg0: args[0],
             arg1: args[1],
@@ -74,8 +91,8 @@ impl From<&[usize; 4]> for SyscallArgs {
     }
 }
 
-impl From<&[usize; 3]> for SyscallArgs {
-    fn from(args: &[usize; 3]) -> Self {
+impl From<&[SyscallWord; 3]> for SyscallArgs {
+    fn from(args: &[SyscallWord; 3]) -> Self {
         SyscallArgs {
             arg0: args[0],
             arg1: args[1],
@@ -87,8 +104,8 @@ impl From<&[usize; 3]> for SyscallArgs {
     }
 }
 
-impl From<&[usize; 2]> for SyscallArgs {
-    fn from(args: &[usize; 2]) -> Self {
+impl From<&[SyscallWord; 2]> for SyscallArgs {
+    fn from(args: &[SyscallWord; 2]) -> Self {
         SyscallArgs {
             arg0: args[0],
             arg1: args[1],
@@ -100,8 +117,8 @@ impl From<&[usize; 2]> for SyscallArgs {
     }
 }
 
-impl From<&[usize; 1]> for SyscallArgs {
-    fn from(args: &[usize; 1]) -> Self {
+impl From<&[SyscallWord; 1]> for SyscallArgs {
+    fn from(args: &[SyscallWord; 1]) -> Self {
         SyscallArgs {
             arg0: args[0],
             arg1: 0,
@@ -113,8 +130,8 @@ impl From<&[usize; 1]> for SyscallArgs {
     }
 }
 
-impl From<&[usize; 0]> for SyscallArgs {
-    fn from(_args: &[usize; 0]) -> Self {
+impl From<&[SyscallWord; 0]> for SyscallArgs {
+    fn from(_args: &[SyscallWord; 0]) -> Self {
         SyscallArgs {
             arg0: 0,
             arg1: 0,

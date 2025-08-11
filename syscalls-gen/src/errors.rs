@@ -1,5 +1,5 @@
 use crate::fetch_path;
-use color_eyre::eyre::{eyre, Result, WrapErr};
+use color_eyre::eyre::{Result, WrapErr, eyre};
 use futures::future::try_join_all;
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -57,13 +57,16 @@ impl<'a> fmt::Display for ErrnoFile<'a> {
 }
 
 pub async fn generate_errno(path: PathBuf, version: String) -> Result<()> {
-    let table = fetch_errno(&[
-        "include/uapi/asm-generic/errno-base.h",
-        "include/uapi/asm-generic/errno.h",
-        // error codes private to the Kernel, but are still useful when
-        // ptracing.
-        "include/linux/errno.h",
-    ], &version)
+    let table = fetch_errno(
+        &[
+            "include/uapi/asm-generic/errno-base.h",
+            "include/uapi/asm-generic/errno.h",
+            // error codes private to the Kernel, but are still useful when
+            // ptracing.
+            "include/linux/errno.h",
+        ],
+        &version,
+    )
     .await?;
 
     let mut file = File::create(&path)
@@ -90,10 +93,8 @@ pub enum Errno {
 }
 
 async fn fetch_errno(paths: &[&str], version: &str) -> Result<Vec<Errno>> {
-    let futures: Vec<_> = paths
-        .iter()
-        .map(|path| fetch_path(path, version))
-        .collect();
+    let futures: Vec<_> =
+        paths.iter().map(|path| fetch_path(path, version)).collect();
 
     let mut errnos = Vec::new();
     for content in try_join_all(futures).await? {

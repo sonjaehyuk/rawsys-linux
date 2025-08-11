@@ -1,6 +1,26 @@
+//! Errno: minimal, no_std-friendly Linux error codes
+//!
+//! `Errno` wraps Linux error numbers and offers lightweight conversions from
+//! raw syscall return values. It intentionally avoids depending on `std` by
+//! default so it can be used in `no_std` environments.
+//!
+//! - Use `Errno::from_ret_u32`/`from_ret_u64` to convert raw returns into
+//!   `Result` without panicking or allocating.
+//! - With the `std` feature, `Errno` integrates with `std::io::Error` and can
+//!   retrieve the thread-local errno via `Errno::last()`.
+//! - For convenience, aliases such as `EWOULDBLOCK` map to canonical variants.
+//!
+//! Design intent
+//! - Avoid conflating OS errors with richer I/O errors: conversion from
+//!   `std::io::Error` is fallible (`from_io_error`) because not every I/O error
+//!   is a plain errno.
+//! - Keep formatting cheap: `Display`/`Debug` prefer static names and short
+//!   messages when available.
+//!
 #[macro_use]
 mod macros;
 
+#[allow(clippy::all, clippy::pedantic)]
 mod generated;
 
 #[cfg(feature = "std")]
@@ -33,7 +53,11 @@ impl Errno {
     }
 
     /// Converts a raw syscall return value to a result.
+    ///
+    /// > Please use [`Errno::from_ret_u32`] or [`Errno::from_ret_u64`].
+    /// > Refactored [`Errno::from_ret`] to handle u32 and u64 explicitly, instead of using usize.
     #[inline(always)]
+    #[deprecated = "It is recommended to explicitly use u32 or u64."]
     pub fn from_ret(value: usize) -> Result<usize, Errno> {
         if value > -4096isize as usize {
             // Truncation of the error value is guaranteed to never occur due to
@@ -45,6 +69,31 @@ impl Errno {
         }
     }
 
+    /// Rewriting of [`Errno::from_ret`] to use a u32 for pointer width. This function is for platforms where a pointer has a size of 32 bits.
+    #[inline(always)]
+    pub fn from_ret_u32(value: u32) -> Result<u32, Errno> {
+        const THRESHOLD: u32 = u32::MAX - 4095; // == (u32)(-4096)
+        if value > THRESHOLD {
+            // Restore -ret to positive errno code (1..=4095).
+            let code = (u32::MAX - value + 1) as i32;
+            Err(Errno(code))
+        } else {
+            Ok(value)
+        }
+    }
+
+    /// Rewriting of [`Errno::from_ret`] to use a u64 for register width. This function is for platforms where the syscall return register is 64 bits.
+    #[inline(always)]
+    pub fn from_ret_u64(value: u64) -> Result<u64, Errno> {
+        const THRESHOLD: u64 = u64::MAX - 4095; // == (u64)(-4096)
+        if value > THRESHOLD {
+            // Restore -ret to positive errno code (1..=4095).
+            let code = (u64::MAX - value + 1) as i32;
+            Err(Errno(code))
+        } else {
+            Ok(value)
+        }
+    }
     /// Returns the last error that occurred.
     #[cfg(feature = "std")]
     pub fn last() -> Self {
@@ -180,10 +229,15 @@ mod test {
         }
     }
 
+    #[allow(deprecated)]
     #[test]
     fn from_ret() {
         assert_eq!(Errno::from_ret(-2isize as usize), Err(Errno::ENOENT));
+        assert_eq!(Errno::from_ret_u64(-2isize as u64), Err(Errno::ENOENT));
+        assert_eq!(Errno::from_ret_u32(-2isize as u32), Err(Errno::ENOENT));
         assert_eq!(Errno::from_ret(2), Ok(2));
+        assert_eq!(Errno::from_ret_u32(2), Ok(2));
+        assert_eq!(Errno::from_ret_u64(2), Ok(2));
     }
 
     #[cfg(feature = "std")]

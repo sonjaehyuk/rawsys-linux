@@ -14,6 +14,9 @@
 // No other registers are clobbered.
 use core::arch::asm;
 
+/// System call argument/return type for ARM (32-bit)
+pub type SyscallWord = u32;
+
 /// Issues a raw system call with 0 arguments.
 ///
 /// # Safety
@@ -21,18 +24,20 @@ use core::arch::asm;
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall0(n: usize) -> usize {
-    let mut ret: usize;
-    asm!(
-        "movs {temp}, r7",
-        "movs r7, {n}",
-        "svc 0",
-        "movs r7, {temp}",
-        n = in(reg) n,
-        temp = out(reg) _,
-        lateout("r0") ret,
-        options(nostack)
-    );
+pub unsafe fn syscall0(n: SyscallWord) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "movs {temp}, r7",
+            "movs r7, {n}",
+            "svc 0",
+            "movs r7, {temp}",
+            n = in(reg) n,
+            temp = out(reg) _,
+            lateout("r0") ret,
+            options(nostack)
+        );
+    }
     ret
 }
 
@@ -43,18 +48,20 @@ pub unsafe fn syscall0(n: usize) -> usize {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall1(n: usize, arg1: usize) -> usize {
-    let mut ret: usize;
-    asm!(
-        "movs {temp}, r7",
-        "movs r7, {n}",
-        "svc 0",
-        "movs r7, {temp}",
-        n = in(reg) n,
-        temp = out(reg) _,
-        inlateout("r0") arg1 => ret,
-        options(nostack)
-    );
+pub unsafe fn syscall1(n: SyscallWord, arg1: SyscallWord) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "movs {temp}, r7",
+            "movs r7, {n}",
+            "svc 0",
+            "movs r7, {temp}",
+            n = in(reg) n,
+            temp = out(reg) _,
+            inlateout("r0") arg1 => ret,
+            options(nostack)
+        );
+    }
     ret
 }
 
@@ -65,19 +72,25 @@ pub unsafe fn syscall1(n: usize, arg1: usize) -> usize {
 /// Running a system call is inherently unsafe. It is the caller's
 /// responsibility to ensure safety.
 #[inline]
-pub unsafe fn syscall2(n: usize, arg1: usize, arg2: usize) -> usize {
-    let mut ret: usize;
-    asm!(
-        "movs {temp}, r7",
-        "movs r7, {n}",
-        "svc 0",
-        "movs r7, {temp}",
-        n = in(reg) n,
-        temp = out(reg) _,
-        inlateout("r0") arg1 => ret,
-        in("r1") arg2,
-        options(nostack)
-    );
+pub unsafe fn syscall2(
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "movs {temp}, r7",
+            "movs r7, {n}",
+            "svc 0",
+            "movs r7, {temp}",
+            n = in(reg) n,
+            temp = out(reg) _,
+            inlateout("r0") arg1 => ret,
+            in("r1") arg2,
+            options(nostack)
+        );
+    }
     ret
 }
 
@@ -89,24 +102,26 @@ pub unsafe fn syscall2(n: usize, arg1: usize, arg2: usize) -> usize {
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall3(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "movs {temp}, r7",
-        "movs r7, {n}",
-        "svc 0",
-        "movs r7, {temp}",
-        n = in(reg) n,
-        temp = out(reg) _,
-        inlateout("r0") arg1 => ret,
-        in("r1") arg2,
-        in("r2") arg3,
-        options(nostack)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "movs {temp}, r7",
+            "movs r7, {n}",
+            "svc 0",
+            "movs r7, {temp}",
+            n = in(reg) n,
+            temp = out(reg) _,
+            inlateout("r0") arg1 => ret,
+            in("r1") arg2,
+            in("r2") arg3,
+            options(nostack)
+        );
+    }
     ret
 }
 
@@ -118,26 +133,28 @@ pub unsafe fn syscall3(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall4(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "movs {temp}, r7",
-        "movs r7, {n}",
-        "svc 0",
-        "movs r7, {temp}",
-        n = in(reg) n,
-        temp = out(reg) _,
-        inlateout("r0") arg1 => ret,
-        in("r1") arg2,
-        in("r2") arg3,
-        in("r3") arg4,
-        options(nostack)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "movs {temp}, r7",
+            "movs r7, {n}",
+            "svc 0",
+            "movs r7, {temp}",
+            n = in(reg) n,
+            temp = out(reg) _,
+            inlateout("r0") arg1 => ret,
+            in("r1") arg2,
+            in("r2") arg3,
+            in("r3") arg4,
+            options(nostack)
+        );
+    }
     ret
 }
 
@@ -149,28 +166,30 @@ pub unsafe fn syscall4(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall5(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-    arg5: usize,
-) -> usize {
-    let mut ret: usize;
-    asm!(
-        "movs {temp}, r7",
-        "movs r7, {n}",
-        "svc 0",
-        "movs r7, {temp}",
-        n = in(reg) n,
-        temp = out(reg) _,
-        inlateout("r0") arg1 => ret,
-        in("r1") arg2,
-        in("r2") arg3,
-        in("r3") arg4,
-        in("r4") arg5,
-        options(nostack)
-    );
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+    arg5: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
+    unsafe {
+        asm!(
+            "movs {temp}, r7",
+            "movs r7, {n}",
+            "svc 0",
+            "movs r7, {temp}",
+            n = in(reg) n,
+            temp = out(reg) _,
+            inlateout("r0") arg1 => ret,
+            in("r1") arg2,
+            in("r2") arg3,
+            in("r3") arg4,
+            in("r4") arg5,
+            options(nostack)
+        );
+    }
     ret
 }
 
@@ -182,31 +201,33 @@ pub unsafe fn syscall5(
 /// responsibility to ensure safety.
 #[inline]
 pub unsafe fn syscall6(
-    n: usize,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-    arg5: usize,
-    arg6: usize,
-) -> usize {
-    let mut ret: usize;
+    n: SyscallWord,
+    arg1: SyscallWord,
+    arg2: SyscallWord,
+    arg3: SyscallWord,
+    arg4: SyscallWord,
+    arg5: SyscallWord,
+    arg6: SyscallWord,
+) -> SyscallWord {
+    let mut ret: SyscallWord;
 
     // NOTE: On ARMv4t, `movs` must be used instead of `mov`.
-    asm!(
-        "movs {temp}, r7",
-        "movs r7, {n}",
-        "svc 0",
-        "movs r7, {temp}",
-        n = in(reg) n,
-        temp = out(reg) _,
-        inlateout("r0") arg1 => ret,
-        in("r1") arg2,
-        in("r2") arg3,
-        in("r3") arg4,
-        in("r4") arg5,
-        in("r5") arg6,
-        options(nostack)
-    );
+    unsafe {
+        asm!(
+            "movs {temp}, r7",
+            "movs r7, {n}",
+            "svc 0",
+            "movs r7, {temp}",
+            n = in(reg) n,
+            temp = out(reg) _,
+            inlateout("r0") arg1 => ret,
+            in("r1") arg2,
+            in("r2") arg3,
+            in("r3") arg4,
+            in("r4") arg5,
+            in("r5") arg6,
+            options(nostack)
+        );
+    }
     ret
 }

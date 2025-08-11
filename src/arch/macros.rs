@@ -41,15 +41,31 @@ macro_rules! syscall_enum {
             /// Constructs a new syscall from the given ID. If the ID does not
             /// represent a valid syscall, returns `None`.
             pub const fn new(id: usize) -> Option<Self> {
-                // TODO: Get rid of this huge match and use the SysnoSet for
-                // checking validity.
-                match id {
-                    $first_num => Some(Self::$first_syscall),
-                    $(
-                        $num => Some(Self::$syscall),
-                    )*
-                    _ => None,
+                // Fast-path range check to avoid underflow on bit calculations.
+                let first = Self::first().id() as usize;
+                let last = Self::last().id() as usize;
+                if id < first || id > last {
+                    return None;
                 }
+
+                // Use the precomputed bitset of valid syscalls (O(1)).
+                // Compute the index and bit mask directly to avoid constructing
+                // a temporary Sysno value.
+                let bit = id - first;
+                let width = usize::BITS as usize;
+                let idx = bit / width;
+                let mask = 1_usize << (bit % width);
+
+                // Borrow the static bitset directly to avoid copying the array.
+                let data = &crate::SysnoSet::ALL.data;
+                if data[idx] & mask == 0 {
+                    return None;
+                }
+
+                // SAFETY: We've verified that `id` corresponds to a valid enum
+                // discriminant using the bitset; the enum is `#[repr(i32)]` so
+                // transmuting the value is sound.
+                Some(unsafe { core::mem::transmute::<i32, Self>(id as i32) })
             }
 
             /// Returns the name of the syscall.
@@ -95,12 +111,6 @@ macro_rules! syscall_enum {
             /// Returns the syscall number.
             pub const fn id(&self) -> i32 {
                 *self as i32
-            }
-
-            /// Returns the length of the syscall table, including any gaps.
-            #[deprecated = "Sysno::len() is misleading. Use Sysno::table_size() instead."]
-            pub const fn len() -> usize {
-                Self::table_size()
             }
 
             /// Returns the total number of valid syscalls.
