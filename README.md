@@ -1,5 +1,7 @@
 # rawsys-linux
 
+[![Crates.io](https://img.shields.io/crates/v/syscalls?style=for-the-badge)](https://crates.io/crates/rawsys-linux)
+[![docs.rs](https://img.shields.io/docsrs/syscalls?style=for-the-badge)](https://docs.rs/rawsys-linux)
 [![Rust 2024](https://img.shields.io/badge/rust-2024-edition?style=for-the-badge&logo=rust)](https://doc.rust-lang.org/edition-guide/)
 ![License](https://img.shields.io/badge/license-BSD--2--Clause-blue?style=for-the-badge)
 

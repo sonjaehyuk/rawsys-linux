@@ -12,7 +12,7 @@ categories = ["os::linux-apis", "no-std"]
 readme = "README.md"
 repository = "https://github.com/sonjaehyuk/rawsys-linux"
 homepage = "https://github.com/sonjaehyuk/rawsys-linux"
-# documentation = "https://docs.rs/syscalls"
+documentation = "https://docs.rs/rawsys-linux"
 
 [features]
 default = ["std", "serde"]
